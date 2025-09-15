@@ -7,6 +7,7 @@ import chefModel from "./models/chefModel.js";
 
 //ROTAS
 import chefRoutes from "./routes/chefRoutes.js"
+import receitasRouter from "./routes/receitasRoutes.js"
 
 const app = express();
 
@@ -27,6 +28,7 @@ conn.sync()
 .catch((error) => console.log(error))
 
 app.use("/api/chefs", chefRoutes)
+app.use("/api/receitas", receitasRouter)
 
 app.get("/", (resquest, response) => {
         response.status(200).json({ mensagem: "olá mundo" })

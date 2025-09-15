@@ -26,11 +26,11 @@ const receitasModel = conn.define(
         allowNull: false
     },
     tempoPreparo: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.FLOAT,
         allowNull: false,
     },
     porcoes: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     dificuldade: {
