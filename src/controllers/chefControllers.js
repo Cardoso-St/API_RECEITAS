@@ -118,7 +118,7 @@ export const listarChef = async (request, response) => {
     response.status(200).json({ mensagem: chefId });
   } catch (error) {
     console.error(error);
-    response.status(500).json({ mensagem: "erro INterno servidor" });
+    response.status(500).json({ mensagem: "erro interno servidor" });
   }
 };
 
