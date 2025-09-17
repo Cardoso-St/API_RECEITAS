@@ -6,8 +6,8 @@ const router = Router()
 router.post("/", cadastrarReceita )
 router.get("/", buscarReceitas )
 router.get("/:id", buscarReceita)
-router.put(":/id", atualizarReceita)
-router.delete(":/id", deletarReceita)
-router.get(":id", filtrarReceitasPorChef)
+router.put("/:id", atualizarReceita)
+router.delete("/:id", deletarReceita)
+router.get("/:id", filtrarReceitasPorChef)
 
 export default router;
