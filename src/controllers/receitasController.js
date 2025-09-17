@@ -1,5 +1,6 @@
 import { request, response } from "express";
 import { chefModel, receitasModel } from "../models/association.js";
+import { where } from "sequelize";
 
 export const cadastrarReceita = async (request, response) => {
   const {
@@ -109,7 +110,7 @@ export const buscarReceitas = async (request, response) => {
     const receitas = await receitasModel.findAndCountAll({
       where:
         dificuldade &&
-        ["facil", "medio", "dificil"].includes(dificuldade.toLowerCase())
+          ["facil", "medio", "dificil"].includes(dificuldade.toLowerCase())
           ? { dificuldade: dificuldade.toLowerCase() }
           : {},
       offset,
@@ -143,7 +144,7 @@ export const buscarReceita = async (request, response) => {
     console.log(receita);
 
     if (!receita) {
-      return response.status(404).json({ mensagem: "receita não encontradas" });
+      return response.status(404).json({ mensagem: "receita não encontrada" });
     }
 
     const receitasComChefs = await receitasModel.findByPk(receita.id, {
@@ -221,7 +222,7 @@ export const atualizarReceita = async (request, response) => {
       modoPreparo,
       tempoPreparo,
       porcoes,
-      dificuldade: dificuldade || receita.dificuldade, 
+      dificuldade: dificuldade || receita.dificuldade,
     });
 
     if (Array.isArray(chefs)) {
@@ -235,7 +236,7 @@ export const atualizarReceita = async (request, response) => {
         });
       }
 
-      await receita.setChefs(chefs); 
+      await receita.setChefs(chefs);
     }
 
     const receitaAtualizada = await receitasModel.findByPk(receita.id, {
@@ -256,3 +257,66 @@ export const atualizarReceita = async (request, response) => {
     return response.status(500).json({ mensagem: "Erro interno do servidor" });
   }
 };
+
+export const deletarReceita = async (request, response) => {
+  const { id } = request.params
+
+  if (!id) {
+    return response.status(400).json({ mensagem: "ID obrigatório" })
+  }
+
+  try {
+    const receita = await receitasModel.findByPk(id, {
+      attributes: { exclude: ["created_at", "updated_at"] },
+      include: {
+        model: chefModel,
+        through: { attributes: [] },
+        attributes: { exclude: ["created_at", "updated_at"] },
+      },
+    })
+
+
+    // Remover as associações entre a receita e os chefs
+    await receita.setChefs([]);
+
+    await receita.destroy();
+
+    response.status(204).send();
+  } catch (error) {
+    console.log(error)
+    response.status(500).json({ mensagem: "Erro interno do servidor" })
+  }
+}
+
+export const filtrarReceitasPorChef = async (request, response) => {
+  const page = parseInt(request.query.page) || 1;
+  const limit = parseInt(request.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  const { chefId } = request.query; 
+
+  try {
+    const receitas = await receitasModel.findAndCountAll({
+      offset,
+      limit,
+      include: {
+        model: chefModel,
+        where: chefId ? { id: chefId } : {}, 
+        attributes: { exclude: ["created_at", "updated_at"] },
+        through: { attributes: [] },
+      },
+      attributes: { exclude: ["created_at", "updated_at"] },
+    });
+
+    response.status(200).json({
+      totalReceitas: receitas.count,
+      totalPaginas: Math.ceil(receitas.count / limit),
+      paginaAtual: page,
+      receitasPorPagina: limit,
+      receitas: receitas.rows,
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(500).json({ mensagem: "Erro interno ao listar receitas" });
+  }
+}

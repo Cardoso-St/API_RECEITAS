@@ -30,8 +30,4 @@ conn.sync()
 app.use("/api/chefs", chefRoutes)
 app.use("/api/receitas", receitasRouter)
 
-app.get("/", (resquest, response) => {
-        response.status(200).json({ mensagem: "olá mundo" })
-    })
-
 export default app;
