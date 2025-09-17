@@ -2,8 +2,7 @@ import { request, response } from "express";
 import chefModel from "../models/chefModel.js";
 
 export const cadastrarChef = async (request, response) => {
-  const { nome, biografia, especialidade, experiencia, nacionalidade } =
-    request.body;
+  const { nome, biografia, especialidade, experiencia, nacionalidade } = request.body;
 
   //Método ANTIGO
 
