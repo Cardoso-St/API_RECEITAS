@@ -19,7 +19,7 @@ export const cadastrarReceita = async (request, response) => {
 
 
   if (!dificuldade || !dificuldadesValidas.includes(dificuldade.toLowerCase())) {
-  return response.status(400).json({ mensagem: "O campo dificuldade deve ser facil, medio ou dificil" });
+    return response.status(400).json({ mensagem: "O campo dificuldade deve ser facil, medio ou dificil" });
   }
 
   if (!titulo) {
@@ -46,7 +46,7 @@ export const cadastrarReceita = async (request, response) => {
     response.status(400).json({ mensagem: "O campo tempoPreparo não ser nulo" });
     return;
   }
-  if (!porcoes || isNaN(porcoes) || porcoes <= 0 ) {
+  if (!porcoes || isNaN(porcoes) || porcoes <= 0) {
     response.status(400).json({ mensagem: "O campo porcoes não ser nulo" });
     return;
   }
@@ -303,7 +303,7 @@ export const filtrarReceitasPorChef = async (request, response) => {
   const limit = parseInt(request.query.limit) || 10;
   const offset = (page - 1) * limit;
 
-  const { chefId } = request.query; 
+  const { chefId } = request.query;
 
   try {
     const receitas = await receitasModel.findAndCountAll({
@@ -311,7 +311,7 @@ export const filtrarReceitasPorChef = async (request, response) => {
       limit,
       include: {
         model: chefModel,
-        where: chefId ? { id: chefId } : {}, 
+        where: chefId ? { id: chefId } : {},
         attributes: { exclude: ["created_at", "updated_at"] },
         through: { attributes: [] },
       },
@@ -328,5 +328,32 @@ export const filtrarReceitasPorChef = async (request, response) => {
   } catch (error) {
     console.log(error);
     response.status(500).json({ mensagem: "Erro interno ao listar receitas" });
+  }
+}
+
+//Upload imagens
+export const cadastrarImagemReceita = async(request, response) = > {
+  const { id } = request.params
+  const { filename, path } = request.file;
+
+  if(!id) {
+    return response.status(400).json({ mensagem: "Id obrigátorio" })
+  }
+
+  try {
+    const receita = await receitasModel.findByPk(id)
+
+    if(!receita) {
+      return response.status(404).json({ mensagem: "receita não encontrada" })
+    }
+
+    receita.imagemReceita = filename;
+    receita.imagemUrl = path;
+
+    await receita.save()
+    response.status(200).json({ mensagem: "capa cadastrada", receita })
+  } catch(error) {
+    console.log(error)
+    response.status(500).json({ mensagem: "erro interno do servidor" })
   }
 }
