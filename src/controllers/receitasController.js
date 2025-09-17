@@ -1,6 +1,6 @@
 import { request, response } from "express";
 import { chefModel, receitasModel } from "../models/association.js";
-import { where } from "sequelize";
+import path from "node:path";
 
 export const cadastrarReceita = async (request, response) => {
   const {
@@ -17,9 +17,15 @@ export const cadastrarReceita = async (request, response) => {
 
   const dificuldadesValidas = ["facil", "medio", "dificil"];
 
-
-  if (!dificuldade || !dificuldadesValidas.includes(dificuldade.toLowerCase())) {
-    return response.status(400).json({ mensagem: "O campo dificuldade deve ser facil, medio ou dificil" });
+  if (
+    !dificuldade ||
+    !dificuldadesValidas.includes(dificuldade.toLowerCase())
+  ) {
+    return response
+      .status(400)
+      .json({
+        mensagem: "O campo dificuldade deve ser facil, medio ou dificil",
+      });
   }
 
   if (!titulo) {
@@ -43,7 +49,9 @@ export const cadastrarReceita = async (request, response) => {
     return;
   }
   if (!tempoPreparo || isNaN(tempoPreparo) || tempoPreparo <= 0) {
-    response.status(400).json({ mensagem: "O campo tempoPreparo não ser nulo" });
+    response
+      .status(400)
+      .json({ mensagem: "O campo tempoPreparo não ser nulo" });
     return;
   }
   if (!porcoes || isNaN(porcoes) || porcoes <= 0) {
@@ -115,7 +123,7 @@ export const buscarReceitas = async (request, response) => {
     const receitas = await receitasModel.findAndCountAll({
       where:
         dificuldade &&
-          ["facil", "medio", "dificil"].includes(dificuldade.toLowerCase())
+        ["facil", "medio", "dificil"].includes(dificuldade.toLowerCase())
           ? { dificuldade: dificuldade.toLowerCase() }
           : {},
       offset,
@@ -212,18 +220,34 @@ export const atualizarReceita = async (request, response) => {
         .status(400)
         .json({ mensagem: "O campo modoPreparo não pode ser nulo" });
     }
-    if (tempoPreparo !== undefined && (isNaN(tempoPreparo) || tempoPreparo <= 0)) {
-      return response.status(400).json({ mensagem: "O campo tempoPreparo deve ser um número positivo" });
+    if (
+      tempoPreparo !== undefined &&
+      (isNaN(tempoPreparo) || tempoPreparo <= 0)
+    ) {
+      return response
+        .status(400)
+        .json({ mensagem: "O campo tempoPreparo deve ser um número positivo" });
     }
 
-    if (porcoes !== undefined && (isNaN(porcoes) || porcoes <= 0 || !Number.isInteger(porcoes))) {
-      return response.status(400).json({ mensagem: "O campo porcoes deve ser um inteiro positivo" });
+    if (
+      porcoes !== undefined &&
+      (isNaN(porcoes) || porcoes <= 0 || !Number.isInteger(porcoes))
+    ) {
+      return response
+        .status(400)
+        .json({ mensagem: "O campo porcoes deve ser um inteiro positivo" });
     }
 
-    if (dificuldadeNormalizada !== undefined && !dificuldadesValidas.includes(dificuldadeNormalizada)) {
-      return response.status(400).json({ mensagem: "O campo dificuldade deve ser facil, medio ou dificil" });
+    if (
+      dificuldadeNormalizada !== undefined &&
+      !dificuldadesValidas.includes(dificuldadeNormalizada)
+    ) {
+      return response
+        .status(400)
+        .json({
+          mensagem: "O campo dificuldade deve ser facil, medio ou dificil",
+        });
     }
-
 
     await receita.update({
       titulo,
@@ -269,10 +293,10 @@ export const atualizarReceita = async (request, response) => {
 };
 
 export const deletarReceita = async (request, response) => {
-  const { id } = request.params
+  const { id } = request.params;
 
   if (!id) {
-    return response.status(400).json({ mensagem: "ID obrigatório" })
+    return response.status(400).json({ mensagem: "ID obrigatório" });
   }
 
   try {
@@ -283,8 +307,7 @@ export const deletarReceita = async (request, response) => {
         through: { attributes: [] },
         attributes: { exclude: ["created_at", "updated_at"] },
       },
-    })
-
+    });
 
     // Remover as associações entre a receita e os chefs
     await receita.setChefs([]);
@@ -293,10 +316,10 @@ export const deletarReceita = async (request, response) => {
 
     response.status(204).send();
   } catch (error) {
-    console.log(error)
-    response.status(500).json({ mensagem: "Erro interno do servidor" })
+    console.log(error);
+    response.status(500).json({ mensagem: "Erro interno do servidor" });
   }
-}
+};
 
 export const filtrarReceitasPorChef = async (request, response) => {
   const page = parseInt(request.query.page) || 1;
@@ -329,31 +352,56 @@ export const filtrarReceitasPorChef = async (request, response) => {
     console.log(error);
     response.status(500).json({ mensagem: "Erro interno ao listar receitas" });
   }
-}
+};
 
-//Upload imagens
-export const cadastrarImagemReceita = async(request, response) = > {
-  const { id } = request.params
+//Upload imagenspinto
+export const cadastrarImagemReceita = async (request, response) => {
+  const { id } = request.params;
   const { filename, path } = request.file;
 
-  if(!id) {
-    return response.status(400).json({ mensagem: "Id obrigátorio" })
+  if (!id) {
+    return response.status(400).json({ mensagem: "Id obrigátorio" });
   }
 
   try {
-    const receita = await receitasModel.findByPk(id)
+    const receita = await receitasModel.findByPk(id);
 
-    if(!receita) {
-      return response.status(404).json({ mensagem: "receita não encontrada" })
+    if (!receita) {
+      return response.status(404).json({ mensagem: "receita não encontrada" });
     }
 
     receita.imagemReceita = filename;
     receita.imagemUrl = path;
 
-    await receita.save()
-    response.status(200).json({ mensagem: "capa cadastrada", receita })
-  } catch(error) {
-    console.log(error)
-    response.status(500).json({ mensagem: "erro interno do servidor" })
+    await receita.save();
+    response
+      .status(200)
+      .json({ mensagem: "Imagem da receita cadastrada", receita });
+  } catch (error) {
+    console.log(error);
+    response.status(500).json({ mensagem: "erro interno do servidor" });
   }
-}
+};
+
+export const buscarImagemReceita = async (request, response) => {
+  const { id } = request.params;
+
+  if (!id) {
+    return response.status(400).json({ mensagem: "Id obrigatório" });
+  }
+
+  try {
+    const receita = await receitasModel.findByPk(id);
+
+    if (!receita || !receita.imagemReceita) {
+      return response.status(404).json({ mensagem: "Imagem não encontrada" });
+    }
+
+    const imagePath = path.resolve(receita.imagemUrl);
+
+    return response.sendFile(imagePath);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ mensagem: "Erro interno do servidor" });
+  }
+};
