@@ -15,6 +15,13 @@ export const cadastrarReceita = async (request, response) => {
 
   const dificuldade = request.body.dificuldade || "facil";
 
+  const dificuldadesValidas = ["facil", "medio", "dificil"];
+
+
+  if (!dificuldade || !dificuldadesValidas.includes(dificuldade.toLowerCase())) {
+  return response.status(400).json({ mensagem: "O campo dificuldade deve ser facil, medio ou dificil" });
+  }
+
   if (!titulo) {
     response.status(400).json({ mensagem: "O campo titulo não ser nulo" });
     return;
@@ -35,13 +42,11 @@ export const cadastrarReceita = async (request, response) => {
     response.status(400).json({ mensagem: "O campo modoPreparo não ser nulo" });
     return;
   }
-  if (!tempoPreparo) {
-    response
-      .status(400)
-      .json({ mensagem: "O campo tempoPreparo não ser nulo" });
+  if (!tempoPreparo || isNaN(tempoPreparo) || tempoPreparo <= 0) {
+    response.status(400).json({ mensagem: "O campo tempoPreparo não ser nulo" });
     return;
   }
-  if (!porcoes) {
+  if (!porcoes || isNaN(porcoes) || porcoes <= 0 ) {
     response.status(400).json({ mensagem: "O campo porcoes não ser nulo" });
     return;
   }
@@ -178,6 +183,9 @@ export const atualizarReceita = async (request, response) => {
     dificuldade,
   } = request.body;
 
+  const dificuldadesValidas = ["facil", "medio", "dificil"];
+  const dificuldadeNormalizada = dificuldade?.toLowerCase();
+
   try {
     const receita = await receitasModel.findByPk(id);
     if (!receita) {
@@ -204,16 +212,18 @@ export const atualizarReceita = async (request, response) => {
         .status(400)
         .json({ mensagem: "O campo modoPreparo não pode ser nulo" });
     }
-    if (tempoPreparo !== undefined && !tempoPreparo) {
-      return response
-        .status(400)
-        .json({ mensagem: "O campo tempoPreparo não pode ser nulo" });
+    if (tempoPreparo !== undefined && (isNaN(tempoPreparo) || tempoPreparo <= 0)) {
+      return response.status(400).json({ mensagem: "O campo tempoPreparo deve ser um número positivo" });
     }
-    if (porcoes !== undefined && !porcoes) {
-      return response
-        .status(400)
-        .json({ mensagem: "O campo porcoes não pode ser nulo" });
+
+    if (porcoes !== undefined && (isNaN(porcoes) || porcoes <= 0 || !Number.isInteger(porcoes))) {
+      return response.status(400).json({ mensagem: "O campo porcoes deve ser um inteiro positivo" });
     }
+
+    if (dificuldadeNormalizada !== undefined && !dificuldadesValidas.includes(dificuldadeNormalizada)) {
+      return response.status(400).json({ mensagem: "O campo dificuldade deve ser facil, medio ou dificil" });
+    }
+
 
     await receita.update({
       titulo,
