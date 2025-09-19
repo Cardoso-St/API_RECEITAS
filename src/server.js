@@ -1,9 +1,7 @@
-import app from "./app.js"
+import app from "./app.js";
 
-const PORT = 3334
+const PORT = 3334;
 
-app.listen(PORT, () =>{
-    console.log(`servidor iniciadop na porta: ${PORT}`)
-      
-    
-    })
+app.listen(PORT, () => {
+  console.log(`servidor iniciadop na porta: ${PORT}`);
+});

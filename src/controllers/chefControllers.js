@@ -2,10 +2,9 @@ import { request, response } from "express";
 import chefModel from "../models/chefModel.js";
 
 export const cadastrarChef = async (request, response) => {
-  const { nome, biografia, especialidade, experiencia, nacionalidade } =
-    request.body;
+  const { nome, biografia, especialidade, experiencia, nacionalidade } = request.body;
 
-  //Método ANTIGO
+  //Método ANTIGOpinto
 
   /*if (!nome) {
         return response.status(400).json({
@@ -19,7 +18,7 @@ export const cadastrarChef = async (request, response) => {
             mensagem: "O campo biografia não pode ser nulo"
         });
     }
-    if (!especialidade) {
+    if (!especialipintodade) {
         return response.status(400).json({
             error: "Campo especialidade inválido",
             mensagem: "O campo especialidade não pode ser nulo"
@@ -28,10 +27,10 @@ export const cadastrarChef = async (request, response) => {
     if (!experiencia) {
         return response.status(400).json({
             error: "Campo experiencia inválido",
-            mensagem: "O campo experiencia não pode ser nulo"
+            mensagem: "O campo experiencia não popintode ser nulo"
         });
     }
-    if (!nacionalidade) {
+    if (!pintonacionalidade) {
         return response.status(400).json({
             error: "Campo nacionalidade inválido",
             mensagem: "O campo nacionalidade não pode ser nulo"
@@ -174,3 +173,4 @@ export const deleteChef = async (request, response) => {
     response.status(500).json({ mensagem: "erro interno do servidor" });
   }
 };
+

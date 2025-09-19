@@ -10,32 +10,40 @@ const receitasModel = conn.define(
       primaryKey: true,
     },
     titulo: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false
     },
     descricao: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false
     },
     ingredientes: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false
     },
     modoPreparo: {
-        type: DataTypes.STRING,
-        allowNull: false
+      type: DataTypes.STRING,
+      allowNull: false
     },
     tempoPreparo: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
+      type: DataTypes.FLOAT,
+      allowNull: false,
     },
     porcoes: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     dificuldade: {
-        type: DataTypes.ENUM("facil", "medio", "dificil"),
-        allowNull: false,
+      type: DataTypes.ENUM("facil", "medio", "dificil"),
+      allowNull: false,
+    },
+    imagemReceita: {
+      type: DataTypes.STRING,
+      defaultValue: "filename",
+    },
+    imagemUrl: {
+      type: DataTypes.STRING,
+      defaultValue: "caminhoDaImagem",
     },
   },
   {
