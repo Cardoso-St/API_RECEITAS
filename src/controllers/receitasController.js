@@ -1,6 +1,6 @@
-import { request, response } from "express";
 import { chefModel, receitasModel } from "../models/association.js";
 import path from "node:path";
+import fs from "fs";
 
 export const cadastrarReceita = async (request, response) => {
   const {
@@ -21,11 +21,9 @@ export const cadastrarReceita = async (request, response) => {
     !dificuldade ||
     !dificuldadesValidas.includes(dificuldade.toLowerCase())
   ) {
-    return response
-      .status(400)
-      .json({
-        mensagem: "O campo dificuldade deve ser facil, medio ou dificil",
-      });
+    return response.status(400).json({
+      mensagem: "O campo dificuldade deve ser facil, medio ou dificil",
+    });
   }
 
   if (!titulo) {
@@ -242,11 +240,9 @@ export const atualizarReceita = async (request, response) => {
       dificuldadeNormalizada !== undefined &&
       !dificuldadesValidas.includes(dificuldadeNormalizada)
     ) {
-      return response
-        .status(400)
-        .json({
-          mensagem: "O campo dificuldade deve ser facil, medio ou dificil",
-        });
+      return response.status(400).json({
+        mensagem: "O campo dificuldade deve ser facil, medio ou dificil",
+      });
     }
 
     await receita.update({
@@ -403,5 +399,45 @@ export const buscarImagemReceita = async (request, response) => {
   } catch (error) {
     console.error(error);
     response.status(500).json({ mensagem: "Erro interno do servidor" });
+  }
+};
+
+export const deletarImagemReceita = async (request, response) => {
+  const { id } = request.params;
+
+  if (!id) {
+    return response.status(400).json({ mensagem: "Id obrigatório" });
+  }
+
+  try {
+    const receita = await receitasModel.findByPk(id);
+
+    if (!receita) {
+      return response.status(404).json({ mensagem: "Receita não encontrada" });
+    }
+
+    // 2. Verificar se a receita possui imagem associada
+    if (receita.imagemReceita) {
+      const imagePath = path.resolve(receita.imagemReceita);
+
+      // 3. Verificar se o arquivo existe antes de tentar deletar
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath); // Remove o arquivo do sistema
+        console.log("Imagem deletada:", imagePath);
+      } else {
+        console.warn("Arquivo não encontrado:", imagePath);
+      }
+
+      // 4. Atualizar a receita no banco (remover referência da imagem)
+      receita.imagemReceita = null;
+      await receita.save();
+
+      return response.status(200).json({ mensagem: "Imagem deletada com sucesso" });
+    } else {
+      return response.status(404).json({ mensagem: "Imagem não encontrada" });
+    }
+  } catch (error) {
+    console.log(error);
+    return response.status(500).json({ mensagem: "Erro interno no servidor" });
   }
 };

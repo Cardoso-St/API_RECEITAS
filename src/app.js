@@ -39,4 +39,3 @@ app.use("/api/chefs", chefRoutes)
 app.use("/api/receitas", receitasRouter)
 
 export default app;
-//pinto

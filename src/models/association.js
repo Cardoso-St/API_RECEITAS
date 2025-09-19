@@ -16,4 +16,3 @@ receitasModel.belongsToMany(chefModel, {
 });
 
 export { chefModel, receitasModel };
-//pinto

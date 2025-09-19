@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { atualizarReceita, buscarImagemReceita, buscarReceita, buscarReceitas, cadastrarImagemReceita, cadastrarReceita, deletarReceita, filtrarReceitasPorChef } from "../controllers/receitasController.js";
+import { atualizarReceita, buscarImagemReceita, buscarReceita, buscarReceitas, cadastrarImagemReceita, cadastrarReceita, deletarImagemReceita, deletarReceita, filtrarReceitasPorChef } from "../controllers/receitasController.js";
 import { imagemUpload } from "../middleware/imagemUpload.js";
 
 const router = Router()
@@ -15,5 +15,6 @@ router.get("/:id", filtrarReceitasPorChef)
 //imagens
 router.post("/:id/imagem", imagemUpload.single('imagem'), cadastrarImagemReceita)
 router.get("/:id/imagem", imagemUpload.single('imagem'), buscarImagemReceita)
+router.delete("/:id/imagem", imagemUpload.single('imagem'), deletarImagemReceita)
 
 export default router;
