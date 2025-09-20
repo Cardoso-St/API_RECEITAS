@@ -135,3 +135,4 @@ export const atualizarUsuario = async (request, response) => {
     return response.status(500).json({ mensagem: "Erro interno do servidor" });
   }
 }
+
