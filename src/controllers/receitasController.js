@@ -350,7 +350,7 @@ export const filtrarReceitasPorChef = async (request, response) => {
   }
 };
 
-//Upload imagenspinto
+//Upload imagens
 export const cadastrarImagemReceita = async (request, response) => {
   const { id } = request.params;
   const { filename, path } = request.file;

@@ -11,6 +11,7 @@ import chefModel from "./models/chefModel.js";
 //ROTAS
 import chefRoutes from "./routes/chefRoutes.js"
 import receitasRouter from "./routes/receitasRoutes.js"
+import usuarioRouter from "./routes/usuarioRoutes.js"
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -37,5 +38,6 @@ conn.sync()
 
 app.use("/api/chefs", chefRoutes)
 app.use("/api/receitas", receitasRouter)
+app.use("/api/usuarios", usuarioRouter)
 
 export default app;
