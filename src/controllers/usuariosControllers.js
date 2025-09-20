@@ -2,9 +2,9 @@ import usuariosModel from "../models/usuariosModels.js";
 import bcrypt from "bcrypt";
 
 export const cadastrarUsuario = async (request, response) => {
-const { nome, email, senha, telefone, endereco } = request.body;
+  const { nome, email, senha, telefone, endereco } = request.body;
   const tipoUsuario = request.body.tipoUsuario || "comum";
-  const ativo = request.body.ativo ?? true; 
+  const ativo = request.body.ativo ?? true;
 
 
   if (!nome) {
@@ -24,14 +24,20 @@ const { nome, email, senha, telefone, endereco } = request.body;
   }
 
   try {
+
+    const usuarioExistente = await usuariosModel.findOne({ where: { email } });
+    if (usuarioExistente) {
+      return response.status(400).json({ mensagem: "Este e-mail já está cadastrado" });
+    }
+    
     // 🔑 Hash da senha
-    const saltRounds = 10; 
+    const saltRounds = 10;
     const senhaHash = await bcrypt.hash(senha, saltRounds);
 
     const usuario = {
       nome,
       email,
-      senha: senhaHash, 
+      senha: senhaHash,
       telefone,
       endereco,
       tipoUsuario,
@@ -40,10 +46,23 @@ const { nome, email, senha, telefone, endereco } = request.body;
 
     const novoUsuario = await usuariosModel.create(usuario);
 
-    response.status(201).json({mensagem: "Usuário cadastrado com sucesso", novoUsuario});
+    response.status(201).json({ mensagem: "Usuário cadastrado com sucesso", novoUsuario });
   } catch (error) {
     console.error(error);
     response.status(500).json({ mensagem: "Erro interno do servidor" });
   }
 
+}
+
+export const buscarUsuarios = async (request, response) => {
+  try {
+    const usuarios = await usuariosModel.findAll({
+      attributes: { exclude: ["senha"] },
+    });
+
+    response.status(200).json(usuarios);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ mensagem: "Erro interno do servidor" });
+  }
 }

@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { cadastrarUsuario } from "../controllers/usuariosControllers.js";
+import { cadastrarUsuario, buscarUsuarios } from "../controllers/usuariosControllers.js";
 
 const router = Router()
 
 router.post("/", cadastrarUsuario)
+router.get("/", buscarUsuarios)
 
 export default router
