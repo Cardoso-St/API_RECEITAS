@@ -12,6 +12,7 @@ import chefModel from "./models/chefModel.js";
 import chefRoutes from "./routes/chefRoutes.js"
 import receitasRouter from "./routes/receitasRoutes.js"
 import usuarioRouter from "./routes/usuarioRoutes.js"
+import authRouter from "./routes/authRoutes.js"
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -39,5 +40,6 @@ conn.sync()
 app.use("/api/chefs", chefRoutes)
 app.use("/api/receitas", receitasRouter)
 app.use("/api/usuarios", usuarioRouter)
+app.use("/api/auth", authRouter)
 
 export default app;

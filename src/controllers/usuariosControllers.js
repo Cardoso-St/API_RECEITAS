@@ -56,14 +56,18 @@ export const cadastrarUsuario = async (request, response) => {
 
 export const buscarUsuarios = async (request, response) => {
   try {
+    if (request.usuario.tipoUsuario !== "admin") {
+      return response.status(403).json({ mensagem: "Acesso negado" });
+    }
+
     const usuarios = await usuariosModel.findAll({
       attributes: { exclude: ["senha"] },
     });
 
-    response.status(200).json(usuarios);
+    return response.status(200).json(usuarios);
   } catch (error) {
     console.error(error);
-    response.status(500).json({ mensagem: "Erro interno do servidor" });
+    return response.status(500).json({ mensagem: "Erro interno do servidor" });
   }
 }
 
@@ -72,6 +76,10 @@ export const atualizarUsuario = async (request, response) => {
   const { nome, email, senha, telefone, endereco, tipoUsuario, ativo } = request.body;
 
   try {
+    if (request.usuario.id !== Number(id) && request.usuario.tipoUsuario !== "admin") {
+      return response.status(403).json({ mensagem: "Acesso negado" });
+    }
+
     const usuario = await usuariosModel.findByPk(id);
     if (!usuario) {
       return response.status(404).json({ mensagem: "Usuário não encontrado" });
@@ -140,6 +148,10 @@ export const buscaUsuario = async (request, response) => {
   const { id } = request.params;
 
   try {
+    if (request.usuario.id !== Number(id) && request.usuario.tipoUsuario !== "admin") {
+      return response.status(403).json({ mensagem: "Acesso negado" });
+    }
+
     const usuario = await usuariosModel.findByPk(id, {
       attributes: { exclude: ["senha"] },
     });
@@ -148,9 +160,9 @@ export const buscaUsuario = async (request, response) => {
       return response.status(404).json({ mensagem: "Usuário não encontrado" });
     }
 
-    response.status(200).json(usuario);
+    return response.status(200).json(usuario);
   } catch (error) {
     console.error(error);
-    response.status(500).json({ mensagem: "Erro interno do servidor" });
+    return response.status(500).json({ mensagem: "Erro interno do servidor" });
   }
 }
