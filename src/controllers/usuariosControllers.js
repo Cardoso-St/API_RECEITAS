@@ -136,3 +136,21 @@ export const atualizarUsuario = async (request, response) => {
   }
 }
 
+export const buscaUsuario = async (request, response) => {
+  const { id } = request.params;
+
+  try {
+    const usuario = await usuariosModel.findByPk(id, {
+      attributes: { exclude: ["senha"] },
+    });
+
+    if (!usuario) {
+      return response.status(404).json({ mensagem: "Usuário não encontrado" });
+    }
+
+    response.status(200).json(usuario);
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ mensagem: "Erro interno do servidor" });
+  }
+}
