@@ -31,3 +31,33 @@ export const login = async (request, response) => {
     response.status(500).json({ mensagem: "Erro interno do servidor" });
   }
 };
+
+// Logout (exemplo simples usando blacklist em memória)
+let blacklistTokens = [];
+
+export const logout = async (request, response) => {
+  const token = request.headers.authorization.split(" ")[1];
+  blacklistTokens.push(token);
+  response.status(200).json({ mensagem: "Logout realizado com sucesso" });
+};
+
+// Refresh token
+export const refreshToken = async (request, response) => {
+  const { token } = request.body;
+  if (!token) return response.status(401).json({ mensagem: "Token não fornecido" });
+
+  try {
+    const usuario = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+    const payload = { id: usuario.id, nome: usuario.nome, email: usuario.email, tipoUsuario: usuario.tipoUsuario };
+    const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "15m" });
+
+    response.status(200).json({ accessToken: newAccessToken, expiresIn: 900 });
+  } catch (error) {
+    return response.status(403).json({ mensagem: "Refresh token inválido ou expirado" });
+  }
+};
+
+// Verificar token válido
+export const verificarToken = async (request, response) => {
+  response.status(200).json({ mensagem: "Token válido", usuario: request.usuario });
+};
