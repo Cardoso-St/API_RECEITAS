@@ -33,3 +33,21 @@ export const adicionarFavorito = async (request, response) => {
     }
 };
 
+export const removerFavorito = async (request, response) => {
+    const { id } = request.params;
+
+    try {
+        const favorito = await favoritosModel.findByPk(id);
+
+        if (!favorito) {
+            return response.status(404).json({ mensagem: "Favorito não encontrado" });
+        }
+
+        await favorito.destroy();
+
+        return response.status(200).json({ mensagem: "Favorito removido com sucesso" });
+    } catch (error) {
+        console.error(error);
+        return response.status(500).json({ mensagem: "Erro interno do servidor" });
+    }
+};

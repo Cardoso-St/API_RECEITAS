@@ -6,5 +6,6 @@ const router = Router();
 
 // Proteger rota com JWT (usuário precisa estar logado)
 router.post("/", autenticarToken, adicionarFavorito);
+router.delete("/:id", autenticarToken, removerFavorito);
 
 export default router;
