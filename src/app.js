@@ -14,6 +14,7 @@ import receitasRouter from "./routes/receitasRoutes.js"
 import usuarioRouter from "./routes/usuarioRoutes.js"
 import authRouter from "./routes/authRoutes.js"
 import favoritasRouter from "./routes/favoritasRoutes.js"
+import curtidasRouter from "./routes/curtidasRoutes.js"
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -43,5 +44,6 @@ app.use("/api/receitas", receitasRouter)
 app.use("/api/usuarios", usuarioRouter)
 app.use("/api/auth", authRouter)
 app.use("/api/favoritas", favoritasRouter);
+app.use("/api/curtidas", curtidasRouter);
 
 export default app;
