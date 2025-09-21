@@ -53,3 +53,21 @@ export const listarCurtidasUsuario = async (req, res) => {
     }
 };
 
+export const receitasMaisCurtidas = async (req, res) => {
+    try {
+        const receitas = await curtidasModel.findAll({
+            attributes: [
+                "receitaId",
+                [Sequelize.fn("COUNT", Sequelize.col("receitaId")), "curtidasCount"],
+            ],
+            group: ["receitaId"],
+            order: [[Sequelize.literal("curtidasCount"), "DESC"]],
+            include: { model: receitasModel, as: "receita" },
+        });
+
+        return res.status(200).json(receitas);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ mensagem: "Erro interno do servidor" });
+    }
+};
