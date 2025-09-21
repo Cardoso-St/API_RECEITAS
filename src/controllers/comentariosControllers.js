@@ -49,15 +49,22 @@ export const listarComentariosReceita = async (request, response) => {
 
 export const editarComentario = async (request, response) => {
     const usuarioId = request.usuario.id;
+    const tipoUsuario = request.usuario.tipoUsuario; // comum ou admin
     const { id } = request.params;
-    const { texto, avaliacao } = request.body;
+    const { texto, avaliacao, aprovado } = request.body;
 
     try {
         const comentario = await comentarioModel.findByPk(id);
         if (!comentario) return response.status(404).json({ mensagem: "Comentário não encontrado" });
 
-        if (comentario.usuarioId !== usuarioId)
-            return response.status(403).json({ mensagem: "Você só pode editar seus próprios comentários" });
+        // Apenas dono ou admin pode editar
+        if (comentario.usuarioId !== usuarioId && tipoUsuario !== "admin")
+            return response.status(403).json({ mensagem: "Você não tem permissão para editar este comentário" });
+
+        // Admin pode alterar aprovação
+        if (tipoUsuario === "admin" && aprovado !== undefined) {
+            comentario.aprovado = aprovado;
+        }
 
         await comentario.update({ texto, avaliacao });
 
@@ -70,14 +77,15 @@ export const editarComentario = async (request, response) => {
 
 export const deletarComentario = async (request, response) => {
     const usuarioId = request.usuario.id;
+    const tipoUsuario = request.usuario.tipoUsuario;
     const { id } = request.params;
 
     try {
         const comentario = await comentarioModel.findByPk(id);
         if (!comentario) return response.status(404).json({ mensagem: "Comentário não encontrado" });
 
-        if (comentario.usuarioId !== usuarioId)
-            return response.status(403).json({ mensagem: "Você só pode deletar seus próprios comentários" });
+        if (comentario.usuarioId !== usuarioId && tipoUsuario !== "admin")
+            return response.status(403).json({ mensagem: "Você não tem permissão para deletar este comentário" });
 
         await comentario.destroy();
         response.status(200).json({ mensagem: "Comentário deletado com sucesso" });
@@ -109,23 +117,23 @@ export const listarComentariosUsuario = async (request, response) => {
 };
 
 export const mediaAvaliacaoReceita = async (request, response) => {
-  const { id: receitaId } = request.params;
+    const { id: receitaId } = request.params;
 
-  try {
-    const media = await comentarioModel.findOne({
-      attributes: [
-        [Sequelize.fn("AVG", Sequelize.col("avaliacao")), "mediaAvaliacao"]
-      ],
-      where: { receitaId, aprovado: true },
-    });
+    try {
+        const media = await comentarioModel.findOne({
+            attributes: [
+                [Sequelize.fn("AVG", Sequelize.col("avaliacao")), "mediaAvaliacao"]
+            ],
+            where: { receitaId, aprovado: true },
+        });
 
-    response.status(200).json({
-      receitaId,
-      mediaAvaliacao: parseFloat(media.dataValues.mediaAvaliacao || 0).toFixed(1),
-    });
-  } catch (error) {
-    console.error(error);
-    response.status(500).json({ mensagem: "Erro interno do servidor" });
-  }
+        response.status(200).json({
+            receitaId,
+            mediaAvaliacao: parseFloat(media.dataValues.mediaAvaliacao || 0).toFixed(1),
+        });
+    } catch (error) {
+        console.error(error);
+        response.status(500).json({ mensagem: "Erro interno do servidor" });
+    }
 };
 
