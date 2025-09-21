@@ -87,7 +87,6 @@ export const deletarComentario = async (request, response) => {
     }
 };
 
-// Listar comentários do usuário logado
 export const listarComentariosUsuario = async (request, response) => {
     const usuarioId = request.usuario.id;
 
@@ -102,9 +101,31 @@ export const listarComentariosUsuario = async (request, response) => {
             order: [["createdAt", "DESC"]],
         });
 
-        res.status(200).json(comentarios);
+        response.status(200).json(comentarios);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ mensagem: "Erro interno do servidor" });
+        response.status(500).json({ mensagem: "Erro interno do servidor" });
     }
 };
+
+export const mediaAvaliacaoReceita = async (request, response) => {
+  const { id: receitaId } = request.params;
+
+  try {
+    const media = await comentarioModel.findOne({
+      attributes: [
+        [Sequelize.fn("AVG", Sequelize.col("avaliacao")), "mediaAvaliacao"]
+      ],
+      where: { receitaId, aprovado: true },
+    });
+
+    response.status(200).json({
+      receitaId,
+      mediaAvaliacao: parseFloat(media.dataValues.mediaAvaliacao || 0).toFixed(1),
+    });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ mensagem: "Erro interno do servidor" });
+  }
+};
+
