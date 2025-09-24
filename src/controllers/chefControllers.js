@@ -4,7 +4,7 @@ import chefModel from "../models/chefModel.js";
 export const cadastrarChef = async (request, response) => {
   const { nome, biografia, especialidade, experiencia, nacionalidade } = request.body;
 
-  //Método ANTIGOpinto
+  //Método ANTIGO
 
   /*if (!nome) {
         return response.status(400).json({
@@ -173,4 +173,6 @@ export const deleteChef = async (request, response) => {
     response.status(500).json({ mensagem: "erro interno do servidor" });
   }
 };
+
+
 
